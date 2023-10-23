@@ -16,7 +16,18 @@ class DatabaseWorker:
             print(f'Can`t establish connection to database: {e}')
             self.conn.close()
 
-    def get_free_tokens(self, amount: int, role: str):
+    def get_all_free_tokens(self):
+        with self.conn.cursor() as cur:
+            cur.execute('SELECT token FROM tokens WHERE telegram_id_user IS NULL')
+            self.conn.commit()
+
+            res = cur.fetchall()
+
+        res = [value[0] for value in res]
+
+        return ''.join(f'{token}&' for token in res)
+
+    def get_free_tokens_limit(self, amount: int, role: str):
         with self.conn.cursor() as cur:
             cur.execute('SELECT token FROM tokens WHERE telegram_id_user IS NULL AND role = %s LIMIT %s',
                         [role, amount])
@@ -41,7 +52,18 @@ class DatabaseWorker:
 
     def get_logins_user(self):
         with self.conn.cursor() as cur:
-            cur.execute('SELECT telegram_id_user FROM tokens WHERE telegram_id_user IS NOT NULL')
+            cur.execute('SELECT telegram_id_user FROM tokens WHERE telegram_id_user IS NOT NULL AND role != \'Admin\'')
+            self.conn.commit()
+
+            res = cur.fetchall()
+
+        res = [value[0] for value in res]
+
+        return ''.join(f'{token}&' for token in res)
+
+    def get_admins_user(self):
+        with self.conn.cursor() as cur:
+            cur.execute('SELECT telegram_id_user FROM tokens WHERE telegram_id_user IS NOT NULL AND role = \'Admin\'')
             self.conn.commit()
 
             res = cur.fetchall()
@@ -52,9 +74,25 @@ class DatabaseWorker:
 
     def attach_user_to_token(self, telegram_id: int, token: str):
         with self.conn.cursor() as cur:
-            cur.execute('UPDATE tokens SET (telegram_id_user, token) = (%s, %s) WHERE token = %s',
-                        [telegram_id, token, token])
-            self.conn.commit()
+            try:
+                cur.execute('UPDATE tokens SET (telegram_id_user, token) = (%s, %s) WHERE token = %s',
+                            [telegram_id, token, token])
+                self.conn.commit()
+
+                return '0'
+            except psycopg2.errors.UniqueViolation as _:
+                return '-1'
+
+    def delete_user_from_tokens(self, telegram_id: int):
+        with self.conn.cursor() as cur:
+            try:
+                cur.execute('UPDATE tokens SET telegram_id_user = NULL WHERE telegram_id_user = %s',
+                            [telegram_id])
+                self.conn.commit()
+
+                return '0'
+            except psycopg2.errors.UniqueViolation as _:
+                return '-1'
 
     @staticmethod
     def __generate_new_token():
@@ -70,7 +108,7 @@ class DatabaseWorker:
 if __name__ == '__main__':
     dw = DatabaseWorker()
 
-    print(dw.get_free_tokens(1, 'Командир отделения'))
-    print(dw.get_logins_user(), 123)
-    dw.attach_user_to_token(123, ';ва')
+    print(dw.get_free_tokens_limit(1, 'Командир отделения'))
+    print(dw.get_logins_user())
+    print(dw.attach_user_to_token(12323, '3onJJtt8ItapyTkbU75le8u4l'))
 
