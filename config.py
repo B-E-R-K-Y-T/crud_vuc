@@ -26,3 +26,4 @@ class EndPoint:
     GET_ROLE = '/get_role'
     DELETE_USER = '/del_user'
     GET_USER = '/get_user'
+    GET_PLATOON_COMMANDER = '/get_platoon_commander'

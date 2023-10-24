@@ -12,3 +12,7 @@ class TokenWorker:
         token = [random.choice(self.alphabet) for _ in range(LEN_TOKEN)]
 
         return ''.join(token)
+
+
+if __name__ == '__main__':
+    print(TokenWorker().generate_new_token())

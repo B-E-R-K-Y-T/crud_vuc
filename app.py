@@ -41,11 +41,16 @@ def save_user():
 
     return '0'
 
-
 @app.route(EndPoint.GET_ROLE)
 def get_role():
     telegram_id = request.args.get('telegram_id')
     return db.get_role_by_telegram_id(int(telegram_id))
+
+
+@app.route(EndPoint.GET_PLATOON_COMMANDER)
+def get_platoon_commander():
+    platoon_number = request.args.get('platoon_number')
+    return db.get_platoon_commander(int(platoon_number))
 
 
 @app.route(EndPoint.ATTACH_TOKEN)

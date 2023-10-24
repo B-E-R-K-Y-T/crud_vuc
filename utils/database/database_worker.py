@@ -67,6 +67,21 @@ class DatabaseWorker:
             self.conn.commit()
 
     @_rollback_if_error
+    def get_platoon_commander(self, platoon_number: int):
+        with self.conn.cursor() as cur:
+            cur.execute('SELECT telegram_id FROM students WHERE platoon_number = %s', [platoon_number])
+            self.conn.commit()
+
+            res = cur.fetchall()
+
+            print(res, platoon_number)
+
+            if res:
+                return str(res[0][0])
+            else:
+                return ''
+
+    @_rollback_if_error
     def get_logins_user(self):
         with self.conn.cursor() as cur:
             cur.execute('SELECT telegram_id_user FROM tokens WHERE telegram_id_user IS NOT NULL AND role != \'Admin\'')
@@ -103,7 +118,10 @@ class DatabaseWorker:
 
             res = cur.fetchall()
 
-            return ''.join(f'{token}&' for token in res[0])
+            if res:
+                return ''.join(f'{token}&' for token in res[0])
+            else:
+                return ''
 
     @_rollback_if_error
     def attach_user_to_token(self, telegram_id: int, token: str):
