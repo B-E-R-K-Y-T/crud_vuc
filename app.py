@@ -103,6 +103,20 @@ def get_user():
     return db.get_user(int(telegram_id))
 
 
+@app.route(EndPoint.ATTACH_USER_ATTENDANCE)
+def attach_user_to_attendance():
+    telegram_id = request.args.get('telegram_id')
+    return db.attach_user_to_attendance(int(telegram_id))
+
+
+@app.route(EndPoint.UPDATE_ATTENDANCE_USER)
+def add_visit_user():
+    date_v = request.args.get('date_v')
+    visiting = request.args.get('visiting')
+    telegram_id = request.args.get('telegram_id')
+    return db.add_visit_user(date_v, int(visiting), int(telegram_id))
+
+
 @app.route(EndPoint.GET_TOKEN)
 def get_token():
     amount = request.args.get('amount')

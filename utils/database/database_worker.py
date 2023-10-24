@@ -104,6 +104,22 @@ class DatabaseWorker:
             self.conn.commit()
 
     @_rollback_if_error
+    def attach_user_to_attendance(self, telegram_id: int):
+        with self.conn.cursor() as cur:
+            cur.execute('INSERT INTO attendance (telegram_id) VALUES(%s)', [telegram_id])
+            self.conn.commit()
+
+    @_rollback_if_error
+    def add_visit_user(self, date_v: str, visiting: int, telegram_id: int):
+        with self.conn.cursor() as cur:
+            cur.execute("UPDATE attendance "
+                        "SET date_v = array_append(date_v, %s), "
+                        "visiting = array_append(visiting, %s) "
+                        "WHERE telegram_id = %s;",
+                        [date_v, visiting, telegram_id])
+            self.conn.commit()
+
+    @_rollback_if_error
     def get_platoon_commander(self, platoon_number: int):
         with self.conn.cursor() as cur:
             cur.execute('SELECT telegram_id FROM students WHERE platoon_number = %s', [platoon_number])
