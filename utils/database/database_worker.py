@@ -1,3 +1,42 @@
+"""Этот модуль предоставляет класс `DatabaseWorker` для управления базой данных.
+
+Подключение к базе данных осуществляется с использованием модуля `psycopg2`, а также импортируются классы `DatabaseConf` и `TokenWorker` из модулей `config` и `utils.token_worker` соответственно.
+
+Функции-декораторы:
+
+- `_rollback_if_error`: Внутренний декоратор, который автоматически откатывает транзакцию в случае возникновения исключения `psycopg2.Error`. Это обеспечивает надежность выполнения операций с базой данных.
+
+Классы:
+
+- `DatabaseWorker`: Класс, представляющий воркер для работы с базой данных. Он предоставляет методы для выполнения различных операций с таблицами базы данных. Класс имеет следующие методы:
+
+  - `__init__(self)`: Конструктор класса, который устанавливает соединение с базой данных, используя параметры, определенные в классе `DatabaseConf`. В случае ошибки подключения, выводится сообщение об ошибке и соединение закрывается.
+
+  - `get_all_free_tokens(self)`: Получает все свободные токены из таблицы `tokens`, где `telegram_id_user` равно `NULL`. Возвращает строку, содержащую все токены, разделенные символом '&'.
+
+  - `set_squad_of_user(self, squad_number: int, telegram_id: int)`: Устанавливает номер отделения (`squad_number`) для пользователя с заданным `telegram_id` в таблице `students`.
+
+  - `get_count_squad_in_platoon(self, platoon_number: int)`: Получает количество отделений во взводе с заданным номером (`platoon_number`) в таблице `students`. Возвращает строку с количеством отделений.
+
+  - `get_platoon(self, platoon_number: int)`: Получает всех студентов из таблицы `students` с заданным номером взвода (`platoon_number`). Возвращает строку, содержащую информацию о студентах, разделенную символом '%', а каждое поле информации - символом '&'.
+
+  - `get_free_tokens_limit(self, amount: int, role: str)`: Получает заданное количество свободных токенов из таблицы `tokens`, где `telegram_id_user` равно `NULL`, `role` соответствует заданной роли (`role`) и длина токена равна `LEN_TOKEN`. Если доступных токенов недостаточно, генерирует новые токены и добавляет их в таблицу. Возвращает строку, содержащую все токены, разделенные символом '&'.
+
+  - `add_token_to_db(self, token: str, role: str)`: Добавляет новый токен (`token`) с указанной ролью (`role`) в таблицу `tokens`.
+
+  - `attach_user_to_attendance(self, telegram_id: int)`: Добавляет пользователя с заданным `telegram_id` в таблицу `attendance`.
+
+  - `add_visit_user(self, date_v: str, visiting: int, telegram_id: int)`: Добавляет посещение пользователя с заданным `telegram_id` в таблицу `attendance` с указанной датой (`date_v`) и посещением (`visiting`).
+
+  - `get_platoon_commander(self, platoon_number: int)`: Получает `telegram_id` командира взвода с заданным номером (`platoon_number`) из таблицы `students`. Возвращает строку с `telegram_id`.
+
+  - `get_logins_user(self)`: Получает все `telegram_id_user` из таблицы `tokens`, где `telegram_id_user` не равно `NULL` и роль (`role`) не равна 'Admin'. Возвращает строку, содержащую все `telegram_id_user`, разделенные символом '&'.
+
+  - `get_admins_user(self)`: Получает все `telegram_id_user` из таблицы `tokens`, где `telegram_id_user` не равно `NULL` и роль (`role`) равна 'Admin'. Возвращает строку, содержащую все `telegram_id_user`, разделенные символом '&'.
+
+  - `get_user(self, telegram_id: int)`: Получает информацию о пользователе с заданным `telegram_id` из таблицы `students`. Возвращает строку с информаци
+"""
+
 import psycopg2
 
 from config import DatabaseConf, LEN_TOKEN
