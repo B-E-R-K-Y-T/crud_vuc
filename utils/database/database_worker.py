@@ -1,8 +1,7 @@
-import random
-import string
 import psycopg2
 
-from config import DatabaseConf, LEN_TOKEN
+from config import DatabaseConf
+from utils.token_worker import TokenWorker
 
 
 class DatabaseWorker:
@@ -39,7 +38,7 @@ class DatabaseWorker:
 
         if not (res and len(res) == amount):
             for _ in range(amount - len(res)):
-                token = self.__generate_new_token()
+                token = TokenWorker().generate_new_token()
                 res.append(token)
                 self.add_token_to_db(token, role)
 
@@ -141,13 +140,6 @@ class DatabaseWorker:
             cur.execute('INSERT INTO platoon (student_t_id, platoon_number) VALUES (%s, %s)',
                         [telegram_id, platoon_number])
             self.conn.commit()
-
-    @staticmethod
-    def __generate_new_token():
-        alphabet = string.ascii_letters + string.digits
-        list_password = [random.choice(alphabet) for _ in range(LEN_TOKEN)]
-
-        return ''.join(list_password)
 
     def __del__(self):
         self.conn.close()
