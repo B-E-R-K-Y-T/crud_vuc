@@ -6,11 +6,9 @@ from config import LEN_TOKEN
 
 class TokenWorker:
     def __init__(self):
-        ...
+        self.alphabet = string.ascii_letters + string.digits
 
-    @staticmethod
-    def generate_new_token():
-        alphabet = string.ascii_letters + string.digits
-        list_password = [random.choice(alphabet) for _ in range(LEN_TOKEN)]
+    def generate_new_token(self):
+        list_password = [random.choice(self.alphabet) for _ in range(LEN_TOKEN)]
 
         return ''.join(list_password)
