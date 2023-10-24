@@ -109,6 +109,8 @@ class DatabaseWorker:
             cur.execute('INSERT INTO attendance (telegram_id) VALUES(%s)', [telegram_id])
             self.conn.commit()
 
+            return '0'
+
     @_rollback_if_error
     def add_visit_user(self, date_v: str, visiting: int, telegram_id: int):
         with self.conn.cursor() as cur:
@@ -118,6 +120,8 @@ class DatabaseWorker:
                         "WHERE telegram_id = %s;",
                         [date_v, visiting, telegram_id])
             self.conn.commit()
+
+            return '0'
 
     @_rollback_if_error
     def get_platoon_commander(self, platoon_number: int):
