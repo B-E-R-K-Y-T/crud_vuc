@@ -9,6 +9,6 @@ class TokenWorker:
         self.alphabet = string.ascii_letters + string.digits
 
     def generate_new_token(self):
-        list_password = [random.choice(self.alphabet) for _ in range(LEN_TOKEN)]
+        token = [random.choice(self.alphabet) for _ in range(LEN_TOKEN)]
 
-        return ''.join(list_password)
+        return ''.join(token)
