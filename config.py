@@ -21,3 +21,8 @@ class EndPoint:
     ATTACH_TOKEN = '/attach_token'
     BAN_USER = '/ban_user'
     GET_LEN_TOKEN = '/get_len_token'
+    SAVE_USER = '/save_user'
+    CHECK_EXIST_USER = '/check_exist_user'
+    GET_ROLE = '/get_role'
+    DELETE_USER = '/del_user'
+    GET_USER = '/get_user'
