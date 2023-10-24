@@ -40,6 +40,43 @@ class DatabaseWorker:
         return ''.join(f'{token}&' for token in res)
 
     @_rollback_if_error
+    def set_squad_of_user(self, squad_number: int, telegram_id: int):
+        with self.conn.cursor() as cur:
+            cur.execute('UPDATE students SET squad_number = %s WHERE telegram_id = %s',
+                        [squad_number, telegram_id])
+            self.conn.commit()
+
+    @_rollback_if_error
+    def get_count_squad_in_platoon(self, platoon_number: int):
+        with self.conn.cursor() as cur:
+            cur.execute('SELECT sum(1) FROM (SELECT 1 '
+                        'FROM students '
+                        'WHERE platoon_number = %s AND ARRAY[squad_number] <@ ARRAY[1, 2, 3] '
+                        'GROUP BY squad_number) as sub_q; ', [platoon_number])
+            self.conn.commit()
+
+            res = cur.fetchall()
+
+            return str(res[0][0])
+
+    @_rollback_if_error
+    def get_platoon(self, platoon_number: int):
+        with self.conn.cursor() as cur:
+            cur.execute('SELECT * FROM students WHERE platoon_number = %s', [platoon_number])
+            self.conn.commit()
+
+            res = cur.fetchall()
+
+            seq_users = ''
+
+            for user in res:
+                seq_users += '%%'
+                for attr in user:
+                    seq_users += f'{attr}&'
+
+            return seq_users
+
+    @_rollback_if_error
     def get_free_tokens_limit(self, amount: int, role: str):
         with self.conn.cursor() as cur:
             cur.execute('SELECT token FROM tokens '
@@ -73,8 +110,6 @@ class DatabaseWorker:
             self.conn.commit()
 
             res = cur.fetchall()
-
-            print(res, platoon_number)
 
             if res:
                 return str(res[0][0])

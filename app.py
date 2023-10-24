@@ -41,10 +41,23 @@ def save_user():
 
     return '0'
 
+
 @app.route(EndPoint.GET_ROLE)
 def get_role():
     telegram_id = request.args.get('telegram_id')
     return db.get_role_by_telegram_id(int(telegram_id))
+
+
+@app.route(EndPoint.GET_PLATOON)
+def get_platoon():
+    platoon_number = request.args.get('platoon_number')
+    return db.get_platoon(int(platoon_number))
+
+
+@app.route(EndPoint.GET_COUNT_PLATOON_SQUAD)
+def get_count_platoon_squad():
+    platoon_number = request.args.get('platoon_number')
+    return db.get_count_squad_in_platoon(int(platoon_number))
 
 
 @app.route(EndPoint.GET_PLATOON_COMMANDER)
@@ -66,10 +79,11 @@ def ban_user():
     return db.ban_user_from_tokens(int(telegram_id))
 
 
-@app.route(EndPoint.GET_USER)
-def get_user():
+@app.route(EndPoint.SET_PLATOON_SQUAD_OF_USER)
+def set_squad_of_user():
+    squad_number = request.args.get('squad_number')
     telegram_id = request.args.get('telegram_id')
-    return db.get_user(int(telegram_id))
+    return db.set_squad_of_user(int(squad_number), int(telegram_id))
 
 
 @app.route(EndPoint.GET_ADMINS)
@@ -81,6 +95,12 @@ def get_admins():
 def delete_user():
     telegram_id = request.args.get('telegram_id')
     return db.delete_user(int(telegram_id))
+
+
+@app.route(EndPoint.GET_USER)
+def get_user():
+    telegram_id = request.args.get('telegram_id')
+    return db.get_user(int(telegram_id))
 
 
 @app.route(EndPoint.GET_TOKEN)

@@ -27,3 +27,6 @@ class EndPoint:
     DELETE_USER = '/del_user'
     GET_USER = '/get_user'
     GET_PLATOON_COMMANDER = '/get_platoon_commander'
+    GET_PLATOON = '/get_platoon'
+    GET_COUNT_PLATOON_SQUAD = '/get_count_squad_in_platoon'
+    SET_PLATOON_SQUAD_OF_USER = '/set_squad_in_platoon_of_user'
