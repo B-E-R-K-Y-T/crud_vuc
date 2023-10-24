@@ -8,7 +8,7 @@ def _rollback_if_error(func):
     def wrapper(self, *args, **kwargs):
         try:
             res = func(self, *args, **kwargs)
-        except Exception as _:
+        except psycopg2.Error as _:
             self.conn.rollback()
         else:
             return res
