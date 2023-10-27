@@ -85,6 +85,8 @@ class DatabaseWorker:
                         [squad_number, telegram_id])
             self.conn.commit()
 
+            return '0'
+
     @_rollback_if_error
     def get_count_squad_in_platoon(self, platoon_number: int):
         with self.conn.cursor() as cur:
