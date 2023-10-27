@@ -153,13 +153,13 @@ class DatabaseWorker:
     @_rollback_if_error
     def add_visit_user(self, date_v: str, visiting: int, telegram_id: int):
         with self.conn.cursor() as cur:
-            cur.execute("UPDATE attendance "
-                        "SET date_v = array_append(date_v, %s), "
-                        "visiting = array_append(visiting, %s) "
-                        "WHERE telegram_id = %s;",
-                        [date_v, visiting, telegram_id])
+            cur.execute("SELECT EXISTS(SELECT id FROM attendance where telegram_id = %s AND date_v = %s)",[telegram_id,date_v])
             self.conn.commit()
-
+            res = cur.fetchone()[0]
+            if res:
+                cur.execute("UPDATE attendance SET date_v = %s, visiting = %s WHERE telegram_id = %s",[date_v,visiting,telegram_id])
+            else:
+                cur.execute("INSERT INTO attendance(telegram_id,date_v,visiting) values(%s,%s,%s)",[telegram_id,date_v,visiting])
             return '0'
 
     @_rollback_if_error
@@ -235,6 +235,7 @@ class DatabaseWorker:
             cur.execute('DELETE FROM students WHERE telegram_id = %s', [telegram_id])
             cur.execute('DELETE FROM platoon WHERE student_t_id = %s', [telegram_id])
             cur.execute('DELETE FROM tokens WHERE telegram_id_user = %s', [telegram_id])
+            cur.execute('DELETE FROM attendance WHERE telegram_id = %s', [telegram_id])
             self.conn.commit()
 
     @_rollback_if_error
